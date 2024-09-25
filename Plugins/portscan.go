@@ -17,6 +17,8 @@ type Addr struct {
 
 // 优化端口扫描输出，优化后，将扫描结果按照IP分组，并输出为如下格式：
 func MapIPToPorts(ipPortList []string) {
+	common.LogSuccess("[*] start port scan")
+
 	ipToPorts := make(map[string][]int)
 	// 遍历列表，解析IP和端口，并将端口添加到对应IP的列表中
 	for _, ipPort := range ipPortList {
@@ -31,6 +33,10 @@ func MapIPToPorts(ipPortList []string) {
 		result := fmt.Sprintf(" %s: %v", ip, ports)
 		common.LogSuccess(result)
 	}
+	tips := fmt.Sprintf("[*] alive ports len is:%d", len(ipPortList))
+	common.LogSuccess(tips)
+	common.LogSuccess("-------------------------------------------------------------------------")
+
 }
 
 /*
@@ -38,6 +44,7 @@ func MapIPToPorts(ipPortList []string) {
 端口扫描
 */
 func PortScan(hostslist []string, ports string, timeout int64) []string {
+	//tips := fmt.Sprintf("[*] start port scan")
 
 	// 存活地址
 	var AliveAddress []string

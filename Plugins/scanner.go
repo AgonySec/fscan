@@ -33,7 +33,6 @@ func Scan(info common.HostInfo) {
 			//fmt.Println("[*] Icmp alive hosts len is:", len(Hosts))
 			//tips := fmt.Sprintf("[*] Icmp alive hosts len is: %d", len(Hosts))
 			//common.LogSuccess(tips)
-
 		}
 		if common.Scantype == "icmp" {
 			common.LogWG.Wait()
@@ -45,12 +44,11 @@ func Scan(info common.HostInfo) {
 		} else if common.Scantype == "hostname" {
 			common.Ports = "139"
 			AlivePorts = NoPortScan(Hosts, common.Ports)
-
 		} else if len(Hosts) > 0 {
 			//端口扫描
 			AlivePorts = PortScan(Hosts, common.Ports, common.Timeout)
-			fmt.Println("[*] alive ports len is:", len(AlivePorts))
-			fmt.Println("---------------------------------------------")
+			//fmt.Println("[*] alive ports len is:", len(AlivePorts))
+			//fmt.Println("---------------------------------------------")
 			if common.Scantype == "portscan" {
 				common.LogWG.Wait()
 				return

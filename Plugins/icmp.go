@@ -59,7 +59,7 @@ func ipSortHandleWorker(Ping bool, AliveHostsChan chan string) {
 	}
 	tips := fmt.Sprintf("[*] Icmp alive hosts len is: %d", len(tmpList))
 	common.LogSuccess(tips)
-	fmt.Println("---------------------------------------------")
+	common.LogSuccess("---------------------------------------------")
 
 }
 
