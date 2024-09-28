@@ -12,7 +12,7 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/interpreter/functions"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/itchen-2002/fscan/Config"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 	"io"
 	"math/rand"
@@ -563,7 +563,7 @@ func randomString(n int) string {
 }
 
 func reverseCheck(r *Reverse, timeout int64) bool {
-	if ceyeApi == "" || r.Domain == "" || !common.DnsLog {
+	if ceyeApi == "" || r.Domain == "" || !Config.DnsLog {
 		return false
 	}
 	time.Sleep(time.Second * time.Duration(timeout))
@@ -627,7 +627,7 @@ func DoRequest(req *http.Request, redirect bool) (*Response, error) {
 	defer oResp.Body.Close()
 	resp, err := ParseResponse(oResp)
 	if err != nil {
-		common.LogError("[-] ParseResponse error: " + err.Error())
+		Config.LogError("[-] ParseResponse error: " + err.Error())
 		//return nil, err
 	}
 	return resp, err

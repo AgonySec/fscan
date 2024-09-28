@@ -6,7 +6,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/itchen-2002/fscan/Config"
 	"golang.org/x/net/proxy"
 	"gopkg.in/yaml.v2"
 	"net"
@@ -29,14 +29,14 @@ var (
 初始化 HTTP 客户端，参数包括线程数、代理类型和超时时间
 */
 func Inithttp() {
-	//common.Proxy = "http://127.0.0.1:8080"
-	if common.PocNum == 0 {
-		common.PocNum = 20
+	//Config.Proxy = "http://127.0.0.1:8080"
+	if Config.PocNum == 0 {
+		Config.PocNum = 20
 	}
-	if common.WebTimeout == 0 {
-		common.WebTimeout = 5
+	if Config.WebTimeout == 0 {
+		Config.WebTimeout = 5
 	}
-	err := InitHttpClient(common.PocNum, common.Proxy, time.Duration(common.WebTimeout)*time.Second)
+	err := InitHttpClient(Config.PocNum, Config.Proxy, time.Duration(Config.WebTimeout)*time.Second)
 	if err != nil {
 		panic(err)
 	}
@@ -64,8 +64,8 @@ func InitHttpClient(ThreadsNum int, DownProxy string, Timeout time.Duration) err
 		DisableKeepAlives:   false,
 	}
 
-	if common.Socks5Proxy != "" {
-		dialSocksProxy, err := common.Socks5Dailer(dialer)
+	if Config.Socks5Proxy != "" {
+		dialSocksProxy, err := Config.Socks5Dailer(dialer)
 		if err != nil {
 			return err
 		}

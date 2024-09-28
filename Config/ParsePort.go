@@ -1,4 +1,4 @@
-package common
+package Config
 
 import (
 	"strconv"
@@ -7,7 +7,8 @@ import (
 
 /*
 *
-端口解析，返回列表
+
+	端口解析，返回列表
 */
 func ParsePort(ports string) (scanPorts []int) {
 	if ports == "" {
