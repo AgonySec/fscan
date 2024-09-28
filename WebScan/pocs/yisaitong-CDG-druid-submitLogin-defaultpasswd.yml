@@ -1,0 +1,14 @@
+name: yisaitong-CDG-druid-submitLogin-defaultpasswd
+rules:
+  - method: POST
+    path: "/CDGServer3/druid/submitLogin"
+    headers:
+      Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+      X-Requested-With: XMLHttpRequest
+    body: "\
+      loginUsername=druid&loginPassword=EstNet.Druid
+      "
+    expression: |
+      response.status == 200
+detail:
+  author: fliggy
