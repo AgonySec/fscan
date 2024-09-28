@@ -51,7 +51,7 @@ func Scan(info Config.HostInfo) {
 			aliveAddr = NoPortScan(aliveHosts, Config.Ports)
 		} else {
 			aliveAddr = PortScan(aliveHosts, Config.Ports, Config.Timeout)
-			fmt.Println("[*] alive ports len is:", len(aliveAddr))
+			//fmt.Println("[*] alive ports len is:", len(aliveAddr))
 			if Config.Scantype == "portscan" {
 
 				Config.LogWG.Wait()
