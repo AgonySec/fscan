@@ -3,8 +3,8 @@ package WebScan
 import (
 	"embed"
 	"fmt"
-	"github.com/itchen-2002/fscan/WebScan/lib"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/AgonySec/fscan/Configs"
+	"github.com/AgonySec/fscan/WebScan/lib"
 	"math/rand"
 	"net/http"
 	"os"
@@ -19,9 +19,9 @@ var Pocs embed.FS
 var once sync.Once
 var AllPocs []*lib.Poc
 
-func WebScan(info *common.HostInfo) {
+func WebScan(info *Configs.HostInfo) {
 	once.Do(initpoc)
-	var pocinfo = common.Pocinfo
+	var pocinfo = Configs.Pocinfo
 	buf := strings.Split(info.Url, "/")
 	pocinfo.Target = strings.Join(buf[:3], "/")
 
@@ -36,27 +36,27 @@ func WebScan(info *common.HostInfo) {
 }
 func getRandomUserAgent() string {
 	rand.Seed(time.Now().UnixNano())
-	return common.UASlice[rand.Intn(len(common.UASlice))]
+	return Configs.UASlice[rand.Intn(len(Configs.UASlice))]
 }
-func Execute(PocInfo common.PocInfo) {
+func Execute(PocInfo Configs.PocInfo) {
 	req, err := http.NewRequest("GET", PocInfo.Target, nil)
 	if err != nil {
 		errlog := fmt.Sprintf("[-] webpocinit %v %v", PocInfo.Target, err)
-		common.LogError(errlog)
+		Configs.LogError(errlog)
 		return
 	}
 	req.Header.Set("User-agent", getRandomUserAgent())
-	req.Header.Set("Accept", common.Accept)
+	req.Header.Set("Accept", Configs.Accept)
 	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
-	if common.Cookie != "" {
-		req.Header.Set("Cookie", common.Cookie)
+	if Configs.Cookie != "" {
+		req.Header.Set("Cookie", Configs.Cookie)
 	}
 	pocs := filterPoc(PocInfo.PocName)
-	lib.CheckMultiPoc(req, pocs, common.PocNum)
+	lib.CheckMultiPoc(req, pocs, Configs.PocNum)
 }
 
 func initpoc() {
-	if common.PocPath == "" {
+	if Configs.PocPath == "" {
 		entries, err := Pocs.ReadDir("pocs")
 		if err != nil {
 			fmt.Printf("[-] init poc error: %v", err)
@@ -71,8 +71,8 @@ func initpoc() {
 			}
 		}
 	} else {
-		fmt.Println("[+] load poc from " + common.PocPath)
-		err := filepath.Walk(common.PocPath,
+		fmt.Println("[+] load poc from " + Configs.PocPath)
+		err := filepath.Walk(Configs.PocPath,
 			func(path string, info os.FileInfo, err error) error {
 				if err != nil || info == nil {
 					return err

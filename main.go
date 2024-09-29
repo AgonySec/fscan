@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/itchen-2002/fscan/Plugins"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/AgonySec/fscan/Configs"
+	"github.com/AgonySec/fscan/Plugins"
 	"time"
 )
 
 func main() {
 	start := time.Now()
 
-	var Info common.HostInfo
+	var Info Configs.HostInfo
 	// 接收输入的参数
-	common.Flag(&Info)
+	Configs.Flag(&Info)
 	// 解析参数
-	common.Parse(&Info)
+	Configs.Parse(&Info)
 	// 开始扫描
 	Plugins.Scan(Info)
 

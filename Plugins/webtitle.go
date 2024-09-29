@@ -12,29 +12,29 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/itchen-2002/fscan/WebScan"
-	"github.com/itchen-2002/fscan/WebScan/lib"
-	"github.com/itchen-2002/fscan/common"
+	"github.com/AgonySec/fscan/Configs"
+	"github.com/AgonySec/fscan/WebScan"
+	"github.com/AgonySec/fscan/WebScan/lib"
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
-func WebTitle(info *common.HostInfo) error {
-	if common.Scantype == "webpoc" {
+func WebTitle(info *Configs.HostInfo) error {
+	if Configs.Scantype == "webpoc" {
 		WebScan.WebScan(info)
 		return nil
 	}
 	err, CheckData := GOWebTitle(info)
 	info.Infostr = WebScan.InfoCheck(info.Url, &CheckData)
 
-	if !common.NoPoc && err == nil {
+	if !Configs.NoPoc && err == nil {
 		WebScan.WebScan(info)
 	} else {
 		errlog := fmt.Sprintf("[-] webtitle %v %v", info.Url, err)
-		common.LogError(errlog)
+		Configs.LogError(errlog)
 	}
 	return err
 }
-func GOWebTitle(info *common.HostInfo) (err error, CheckData []WebScan.CheckDatas) {
+func GOWebTitle(info *Configs.HostInfo) (err error, CheckData []WebScan.CheckDatas) {
 	if info.Url == "" {
 		switch info.Ports {
 		case "80":
@@ -43,13 +43,13 @@ func GOWebTitle(info *common.HostInfo) (err error, CheckData []WebScan.CheckData
 			info.Url = fmt.Sprintf("https://%s", info.Host)
 		default:
 			host := fmt.Sprintf("%s:%s", info.Host, info.Ports)
-			protocol := GetProtocol(host, common.Timeout)
+			protocol := GetProtocol(host, Configs.Timeout)
 			info.Url = fmt.Sprintf("%s://%s:%s", protocol, info.Host, info.Ports)
 		}
 	} else {
 		if !strings.Contains(info.Url, "://") {
 			host := strings.Split(info.Url, "/")[0]
-			protocol := GetProtocol(host, common.Timeout)
+			protocol := GetProtocol(host, Configs.Timeout)
 			info.Url = fmt.Sprintf("%s://%s", protocol, info.Url)
 		}
 	}
@@ -88,7 +88,7 @@ func GOWebTitle(info *common.HostInfo) (err error, CheckData []WebScan.CheckData
 	return
 }
 
-func geturl(info *common.HostInfo, flag int, CheckData []WebScan.CheckDatas) (error, string, []WebScan.CheckDatas) {
+func geturl(info *Configs.HostInfo, flag int, CheckData []WebScan.CheckDatas) (error, string, []WebScan.CheckDatas) {
 	//flag 1 first try
 	//flag 2 /favicon.ico
 	//flag 3 302
@@ -107,14 +107,14 @@ func geturl(info *common.HostInfo, flag int, CheckData []WebScan.CheckDatas) (er
 	if err != nil {
 		return err, "", CheckData
 	}
-	req.Header.Set("User-agent", common.UserAgent)
-	req.Header.Set("Accept", common.Accept)
+	req.Header.Set("User-agent", Configs.UserAgent)
+	req.Header.Set("Accept", Configs.Accept)
 	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
-	if common.Cookie != "" {
-		req.Header.Set("Cookie", common.Cookie)
+	if Configs.Cookie != "" {
+		req.Header.Set("Cookie", Configs.Cookie)
 	}
-	//if common.Pocinfo.Cookie != "" {
-	//	req.Header.Set("Cookie", "rememberMe=1;"+common.Pocinfo.Cookie)
+	//if Configs.Pocinfo.Cookie != "" {
+	//	req.Header.Set("Cookie", "rememberMe=1;"+Configs.Pocinfo.Cookie)
 	//} else {
 	//	req.Header.Set("Cookie", "rememberMe=1")
 	//}
@@ -156,7 +156,7 @@ func geturl(info *common.HostInfo, flag int, CheckData []WebScan.CheckDatas) (er
 		if reurl != "" {
 			result += fmt.Sprintf(" 跳转url: %s", reurl)
 		}
-		common.LogSuccess(result)
+		Configs.LogSuccess(result)
 	}
 	if reurl != "" {
 		return nil, reurl, CheckData
@@ -227,7 +227,7 @@ func GetProtocol(host string, Timeout int64) (protocol string) {
 		return
 	}
 
-	socksconn, err := common.WrapperTcpWithTimeout("tcp", host, time.Duration(Timeout)*time.Second)
+	socksconn, err := Configs.WrapperTcpWithTimeout("tcp", host, time.Duration(Timeout)*time.Second)
 	if err != nil {
 		return
 	}
@@ -236,7 +236,7 @@ func GetProtocol(host string, Timeout int64) (protocol string) {
 		if conn != nil {
 			defer func() {
 				if err := recover(); err != nil {
-					common.LogError(err)
+					Configs.LogError(err)
 				}
 			}()
 			conn.Close()

@@ -1,4 +1,4 @@
-module github.com/itchen-2002/fscan
+module github.com/AgonySec/fscan
 
 go 1.19
 
