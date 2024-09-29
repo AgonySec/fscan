@@ -2,7 +2,7 @@ package Plugins
 
 import (
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"net"
 	"os"
 	"strings"
@@ -11,15 +11,15 @@ import (
 	"github.com/hirochachacha/go-smb2"
 )
 
-func SmbScan2(info *Config.HostInfo) (tmperr error) {
-	if Config.IsBrute {
+func SmbScan2(info *common.HostInfo) (tmperr error) {
+	if common.IsBrute {
 		return nil
 	}
 	hasprint := false
 	starttime := time.Now().Unix()
-	if len(Config.HashBytes) > 0 {
-		for _, user := range Config.Userdict["smb"] {
-			for _, hash := range Config.HashBytes {
+	if len(common.HashBytes) > 0 {
+		for _, user := range common.Userdict["smb"] {
+			for _, hash := range common.HashBytes {
 				pass := ""
 				flag, err, flag2 := Smb2Con(info, user, pass, hash, hasprint)
 				if flag2 {
@@ -27,43 +27,43 @@ func SmbScan2(info *Config.HostInfo) (tmperr error) {
 				}
 				if flag == true {
 					var result string
-					if Config.Domain != "" {
-						result = fmt.Sprintf("[+] SMB2 %v:%v:%v\\%v ", info.Host, info.Ports, Config.Domain, user)
+					if common.Domain != "" {
+						result = fmt.Sprintf("[+] SMB2 %v:%v:%v\\%v ", info.Host, info.Ports, common.Domain, user)
 					} else {
 						result = fmt.Sprintf("[+] SMB2 %v:%v:%v ", info.Host, info.Ports, user)
 					}
 					if len(hash) > 0 {
-						result += "hash: " + Config.Hash
+						result += "hash: " + common.Hash
 					} else {
 						result += pass
 					}
-					Config.LogSuccess(result)
+					common.LogSuccess(result)
 					return err
 				} else {
 					var errlog string
-					if len(Config.Hash) > 0 {
-						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, Config.Hash, err)
+					if len(common.Hash) > 0 {
+						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, common.Hash, err)
 					} else {
 						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, pass, err)
 					}
 					errlog = strings.Replace(errlog, "\n", " ", -1)
-					Config.LogError(errlog)
+					common.LogError(errlog)
 					tmperr = err
-					if Config.CheckErrs(err) {
+					if common.CheckErrs(err) {
 						return err
 					}
-					if time.Now().Unix()-starttime > (int64(len(Config.Userdict["smb"])*len(Config.HashBytes)) * Config.Timeout) {
+					if time.Now().Unix()-starttime > (int64(len(common.Userdict["smb"])*len(common.HashBytes)) * common.Timeout) {
 						return err
 					}
 				}
-				if len(Config.Hash) > 0 {
+				if len(common.Hash) > 0 {
 					break
 				}
 			}
 		}
 	} else {
-		for _, user := range Config.Userdict["smb"] {
-			for _, pass := range Config.Passwords {
+		for _, user := range common.Userdict["smb"] {
+			for _, pass := range common.Passwords {
 				pass = strings.Replace(pass, "{user}", user, -1)
 				hash := []byte{}
 				flag, err, flag2 := Smb2Con(info, user, pass, hash, hasprint)
@@ -72,36 +72,36 @@ func SmbScan2(info *Config.HostInfo) (tmperr error) {
 				}
 				if flag == true {
 					var result string
-					if Config.Domain != "" {
-						result = fmt.Sprintf("[+] SMB2 %v:%v:%v\\%v ", info.Host, info.Ports, Config.Domain, user)
+					if common.Domain != "" {
+						result = fmt.Sprintf("[+] SMB2 %v:%v:%v\\%v ", info.Host, info.Ports, common.Domain, user)
 					} else {
 						result = fmt.Sprintf("[+] SMB2 %v:%v:%v ", info.Host, info.Ports, user)
 					}
 					if len(hash) > 0 {
-						result += "hash: " + Config.Hash
+						result += "hash: " + common.Hash
 					} else {
 						result += pass
 					}
-					Config.LogSuccess(result)
+					common.LogSuccess(result)
 					return err
 				} else {
 					var errlog string
-					if len(Config.Hash) > 0 {
-						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, Config.Hash, err)
+					if len(common.Hash) > 0 {
+						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, common.Hash, err)
 					} else {
 						errlog = fmt.Sprintf("[-] smb2 %v:%v %v %v %v", info.Host, 445, user, pass, err)
 					}
 					errlog = strings.Replace(errlog, "\n", " ", -1)
-					Config.LogError(errlog)
+					common.LogError(errlog)
 					tmperr = err
-					if Config.CheckErrs(err) {
+					if common.CheckErrs(err) {
 						return err
 					}
-					if time.Now().Unix()-starttime > (int64(len(Config.Userdict["smb"])*len(Config.Passwords)) * Config.Timeout) {
+					if time.Now().Unix()-starttime > (int64(len(common.Userdict["smb"])*len(common.Passwords)) * common.Timeout) {
 						return err
 					}
 				}
-				if len(Config.Hash) > 0 {
+				if len(common.Hash) > 0 {
 					break
 				}
 			}
@@ -111,15 +111,15 @@ func SmbScan2(info *Config.HostInfo) (tmperr error) {
 	return tmperr
 }
 
-func Smb2Con(info *Config.HostInfo, user string, pass string, hash []byte, hasprint bool) (flag bool, err error, flag2 bool) {
-	conn, err := net.DialTimeout("tcp", info.Host+":445", time.Duration(Config.Timeout)*time.Second)
+func Smb2Con(info *common.HostInfo, user string, pass string, hash []byte, hasprint bool) (flag bool, err error, flag2 bool) {
+	conn, err := net.DialTimeout("tcp", info.Host+":445", time.Duration(common.Timeout)*time.Second)
 	if err != nil {
 		return
 	}
 	defer conn.Close()
 	initiator := smb2.NTLMInitiator{
 		User:   user,
-		Domain: Config.Domain,
+		Domain: common.Domain,
 	}
 	if len(hash) > 0 {
 		initiator.Hash = hash
@@ -141,18 +141,18 @@ func Smb2Con(info *Config.HostInfo, user string, pass string, hash []byte, haspr
 	}
 	if !hasprint {
 		var result string
-		if Config.Domain != "" {
-			result = fmt.Sprintf("[*] SMB2-shares %v:%v:%v\\%v ", info.Host, info.Ports, Config.Domain, user)
+		if common.Domain != "" {
+			result = fmt.Sprintf("[*] SMB2-shares %v:%v:%v\\%v ", info.Host, info.Ports, common.Domain, user)
 		} else {
 			result = fmt.Sprintf("[*] SMB2-shares %v:%v:%v ", info.Host, info.Ports, user)
 		}
 		if len(hash) > 0 {
-			result += "hash: " + Config.Hash
+			result += "hash: " + common.Hash
 		} else {
 			result += pass
 		}
 		result = fmt.Sprintf("%v shares: %v", result, names)
-		Config.LogSuccess(result)
+		common.LogSuccess(result)
 		flag2 = true
 	}
 	fs, err := s.Mount("C$")

@@ -2,7 +2,7 @@ package Plugins
 
 import (
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"sort"
 	"strconv"
 	"strings"
@@ -17,7 +17,7 @@ type Addr struct {
 
 // 优化端口扫描输出，优化后，将扫描结果按照IP分组，并输出为如下格式：
 func MapIPToPorts(ipPortList []string) {
-	Config.LogSuccess("[*] start port scan")
+	common.LogSuccess("[*] start port scan")
 
 	ipToPorts := make(map[string][]int)
 	// 遍历列表，解析IP和端口，并将端口添加到对应IP的列表中
@@ -31,11 +31,11 @@ func MapIPToPorts(ipPortList []string) {
 	for ip, ports := range ipToPorts {
 		sort.Ints(ports)
 		result := fmt.Sprintf(" %s: %v", ip, ports)
-		Config.LogSuccess(result)
+		common.LogSuccess(result)
 	}
 	tips := fmt.Sprintf("[*] alive ports len is:%d", len(ipPortList))
-	Config.LogSuccess(tips)
-	Config.LogSuccess("-------------------------------------------------------------------------")
+	common.LogSuccess(tips)
+	common.LogSuccess("-------------------------------------------------------------------------")
 
 }
 
@@ -49,13 +49,13 @@ func PortScan(hostslist []string, ports string, timeout int64) []string {
 	// 存活地址
 	var AliveAddress []string
 	// 需要扫描端口列表
-	probePorts := Config.ParsePort(ports)
+	probePorts := common.ParsePort(ports)
 	if len(probePorts) == 0 {
 		fmt.Printf("[-] parse port %s error, please check your port format\n", ports)
 		return AliveAddress
 	}
 	// 将不需要扫描的端口过滤掉
-	noPorts := Config.ParsePort(Config.NoPorts)
+	noPorts := common.ParsePort(common.NoPorts)
 	if len(noPorts) > 0 {
 		temp := map[int]struct{}{}
 		for _, port := range probePorts {
@@ -74,7 +74,7 @@ func PortScan(hostslist []string, ports string, timeout int64) []string {
 		sort.Ints(probePorts)
 	}
 	// 默认扫描线程数为600
-	workers := Config.Threads
+	workers := common.Threads
 	// 创建了两个Go语言的通道（chan）缓冲区大小为100。这两个通道用于在并发 goroutine 之间安全地传递数据，而不需要显式地使用锁。
 	Addrs := make(chan Addr, 100)
 	results := make(chan string, 100)
@@ -124,20 +124,20 @@ func PortScan(hostslist []string, ports string, timeout int64) []string {
 */
 func PortConnect(addr Addr, respondingHosts chan<- string, adjustedTimeout int64, wg *sync.WaitGroup) {
 	host, port := addr.ip, addr.port
-	conn, err := Config.WrapperTcpWithTimeout("tcp4", fmt.Sprintf("%s:%v", host, port), time.Duration(adjustedTimeout)*time.Second)
+	conn, err := common.WrapperTcpWithTimeout("tcp4", fmt.Sprintf("%s:%v", host, port), time.Duration(adjustedTimeout)*time.Second)
 	if err == nil {
 		defer conn.Close()
 		address := host + ":" + strconv.Itoa(port)
 		//result := fmt.Sprintf("%s open", address)
-		//Config.LogSuccess(result)
+		//common.LogSuccess(result)
 		wg.Add(1)
 		respondingHosts <- address
 	}
 }
 
 func NoPortScan(hostslist []string, ports string) (AliveAddress []string) {
-	probePorts := Config.ParsePort(ports)
-	noPorts := Config.ParsePort(Config.NoPorts)
+	probePorts := common.ParsePort(ports)
+	noPorts := common.ParsePort(common.NoPorts)
 	if len(noPorts) > 0 {
 		temp := map[int]struct{}{}
 		for _, port := range probePorts {

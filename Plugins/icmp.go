@@ -3,7 +3,7 @@ package Plugins
 import (
 	"bytes"
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"golang.org/x/net/icmp"
 	"net"
 	"os/exec"
@@ -44,22 +44,22 @@ func ipSortHandleWorker(Ping bool, AliveHostsChan chan string) {
 	livewg.Wait()
 	sortIPs(AliveHosts)
 	tmpList := AliveHosts
-	if Config.Silent == false {
+	if common.Silent == false {
 		if Ping == false {
 			for _, ip := range tmpList {
 				result := fmt.Sprintf(" {icmp} Target %-15s is alive", ip)
-				Config.LogSuccess(result)
+				common.LogSuccess(result)
 			}
 		} else {
 			for _, ip := range tmpList {
 				result := fmt.Sprintf(" {ping} Target %-15s is alive", ip)
-				Config.LogSuccess(result)
+				common.LogSuccess(result)
 			}
 		}
 	}
 	tips := fmt.Sprintf("[*] Icmp alive hosts len is: %d", len(tmpList))
-	Config.LogSuccess(tips)
-	Config.LogSuccess("---------------------------------------------")
+	common.LogSuccess(tips)
+	common.LogSuccess("---------------------------------------------")
 
 }
 
@@ -70,7 +70,7 @@ func ipSortHandleWorker(Ping bool, AliveHostsChan chan string) {
 func CheckLive(hostslist []string, Ping bool) []string {
 	chanHosts := make(chan string, len(hostslist))
 	tips := fmt.Sprintf("[*] start alive scan:")
-	Config.LogSuccess(tips)
+	common.LogSuccess(tips)
 	//aliveHostsChan := make(chan string, len(WaitCheckHosts))
 	go ipSortHandleWorker(Ping, chanHosts)
 
@@ -78,7 +78,7 @@ func CheckLive(hostslist []string, Ping bool) []string {
 	//	for ip := range chanHosts {
 	//		if _, ok := ExistHosts[ip]; !ok && IsContain(hostslist, ip) {
 	//			ExistHosts[ip] = struct{}{}
-	//			if Config.Silent == false {
+	//			if common.Silent == false {
 	//				if Ping == false {
 	//					fmt.Printf("(icmp) Target %-15s is alive\n", ip)
 	//				} else {
@@ -100,7 +100,7 @@ func CheckLive(hostslist []string, Ping bool) []string {
 		if err == nil {
 			RunIcmp1(hostslist, conn, chanHosts)
 		} else {
-			Config.LogError(err)
+			common.LogError(err)
 			//尝试无监听icmp探测
 			fmt.Println("trying RunIcmp2")
 			conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
@@ -112,7 +112,7 @@ func CheckLive(hostslist []string, Ping bool) []string {
 			if err == nil {
 				RunIcmp2(hostslist, chanHosts)
 			} else {
-				Config.LogError(err)
+				common.LogError(err)
 				//使用ping探测
 				fmt.Println("The current user permissions unable to send icmp packets")
 				fmt.Println("start ping")
@@ -125,17 +125,17 @@ func CheckLive(hostslist []string, Ping bool) []string {
 	close(chanHosts)
 
 	if len(hostslist) > 1000 {
-		arrTop, arrLen := ArrayCountValueTop(AliveHosts, Config.LiveTop, true)
+		arrTop, arrLen := ArrayCountValueTop(AliveHosts, common.LiveTop, true)
 		for i := 0; i < len(arrTop); i++ {
 			output := fmt.Sprintf("[*] LiveTop %-16s 段存活数量为: %d", arrTop[i]+".0.0/16", arrLen[i])
-			Config.LogSuccess(output)
+			common.LogSuccess(output)
 		}
 	}
 	if len(hostslist) > 256 {
-		arrTop, arrLen := ArrayCountValueTop(AliveHosts, Config.LiveTop, false)
+		arrTop, arrLen := ArrayCountValueTop(AliveHosts, common.LiveTop, false)
 		for i := 0; i < len(arrTop); i++ {
 			output := fmt.Sprintf("[*] LiveTop %-16s 段存活数量为: %d", arrTop[i]+".0/24", arrLen[i])
-			Config.LogSuccess(output)
+			common.LogSuccess(output)
 		}
 	}
 

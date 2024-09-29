@@ -2,14 +2,14 @@ package Plugins
 
 import (
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"github.com/jlaffaye/ftp"
 	"strings"
 	"time"
 )
 
-func FtpScan(info *Config.HostInfo) (tmperr error) {
-	if Config.IsBrute {
+func FtpScan(info *common.HostInfo) (tmperr error) {
+	if common.IsBrute {
 		return
 	}
 	starttime := time.Now().Unix()
@@ -18,27 +18,27 @@ func FtpScan(info *Config.HostInfo) (tmperr error) {
 		return err
 	} else {
 		errlog := fmt.Sprintf("[-] ftp %v:%v %v %v", info.Host, info.Ports, "anonymous", err)
-		Config.LogError(errlog)
+		common.LogError(errlog)
 		tmperr = err
-		if Config.CheckErrs(err) {
+		if common.CheckErrs(err) {
 			return err
 		}
 	}
 
-	for _, user := range Config.Userdict["ftp"] {
-		for _, pass := range Config.Passwords {
+	for _, user := range common.Userdict["ftp"] {
+		for _, pass := range common.Passwords {
 			pass = strings.Replace(pass, "{user}", user, -1)
 			flag, err := FtpConn(info, user, pass)
 			if flag && err == nil {
 				return err
 			} else {
 				errlog := fmt.Sprintf("[-] ftp %v:%v %v %v %v", info.Host, info.Ports, user, pass, err)
-				Config.LogError(errlog)
+				common.LogError(errlog)
 				tmperr = err
-				if Config.CheckErrs(err) {
+				if common.CheckErrs(err) {
 					return err
 				}
-				if time.Now().Unix()-starttime > (int64(len(Config.Userdict["ftp"])*len(Config.Passwords)) * Config.Timeout) {
+				if time.Now().Unix()-starttime > (int64(len(common.Userdict["ftp"])*len(common.Passwords)) * common.Timeout) {
 					return err
 				}
 			}
@@ -47,10 +47,10 @@ func FtpScan(info *Config.HostInfo) (tmperr error) {
 	return tmperr
 }
 
-func FtpConn(info *Config.HostInfo, user string, pass string) (flag bool, err error) {
+func FtpConn(info *common.HostInfo, user string, pass string) (flag bool, err error) {
 	flag = false
 	Host, Port, Username, Password := info.Host, info.Ports, user, pass
-	conn, err := ftp.DialTimeout(fmt.Sprintf("%v:%v", Host, Port), time.Duration(Config.Timeout)*time.Second)
+	conn, err := ftp.DialTimeout(fmt.Sprintf("%v:%v", Host, Port), time.Duration(common.Timeout)*time.Second)
 	if err == nil {
 		err = conn.Login(Username, Password)
 		if err == nil {
@@ -72,7 +72,7 @@ func FtpConn(info *Config.HostInfo, user string, pass string) (flag bool, err er
 					}
 				}
 			}
-			Config.LogSuccess(result)
+			common.LogSuccess(result)
 		}
 	}
 	return flag, err

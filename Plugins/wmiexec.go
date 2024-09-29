@@ -3,7 +3,7 @@ package Plugins
 import (
 	"errors"
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"os"
 	"strings"
 	"time"
@@ -26,43 +26,43 @@ func init() {
 	flag = true
 }
 
-func WmiExec(info *Config.HostInfo) (tmperr error) {
-	if Config.IsBrute {
+func WmiExec(info *common.HostInfo) (tmperr error) {
+	if common.IsBrute {
 		return nil
 	}
 	starttime := time.Now().Unix()
-	for _, user := range Config.Userdict["smb"] {
+	for _, user := range common.Userdict["smb"] {
 	PASS:
-		for _, pass := range Config.Passwords {
+		for _, pass := range common.Passwords {
 			pass = strings.Replace(pass, "{user}", user, -1)
-			flag, err := Wmiexec(info, user, pass, Config.Hash)
+			flag, err := Wmiexec(info, user, pass, common.Hash)
 			errlog := fmt.Sprintf("[-] WmiExec %v:%v %v %v %v", info.Host, 445, user, pass, err)
 			errlog = strings.Replace(errlog, "\n", "", -1)
-			Config.LogError(errlog)
+			common.LogError(errlog)
 			if flag == true {
 				var result string
-				if Config.Domain != "" {
-					result = fmt.Sprintf("[+] WmiExec %v:%v:%v\\%v ", info.Host, info.Ports, Config.Domain, user)
+				if common.Domain != "" {
+					result = fmt.Sprintf("[+] WmiExec %v:%v:%v\\%v ", info.Host, info.Ports, common.Domain, user)
 				} else {
 					result = fmt.Sprintf("[+] WmiExec %v:%v:%v ", info.Host, info.Ports, user)
 				}
-				if Config.Hash != "" {
-					result += "hash: " + Config.Hash
+				if common.Hash != "" {
+					result += "hash: " + common.Hash
 				} else {
 					result += pass
 				}
-				Config.LogSuccess(result)
+				common.LogSuccess(result)
 				return err
 			} else {
 				tmperr = err
-				if Config.CheckErrs(err) {
+				if common.CheckErrs(err) {
 					return err
 				}
-				if time.Now().Unix()-starttime > (int64(len(Config.Userdict["smb"])*len(Config.Passwords)) * Config.Timeout) {
+				if time.Now().Unix()-starttime > (int64(len(common.Userdict["smb"])*len(common.Passwords)) * common.Timeout) {
 					return err
 				}
 			}
-			if len(Config.Hash) == 32 {
+			if len(common.Hash) == 32 {
 				break PASS
 			}
 		}
@@ -70,10 +70,10 @@ func WmiExec(info *Config.HostInfo) (tmperr error) {
 	return tmperr
 }
 
-func Wmiexec(info *Config.HostInfo, user string, pass string, hash string) (flag bool, err error) {
+func Wmiexec(info *common.HostInfo, user string, pass string, hash string) (flag bool, err error) {
 	target := fmt.Sprintf("%s:%v", info.Host, info.Ports)
-	wmiexec.Timeout = int(Config.Timeout)
-	return WMIExec(target, user, pass, hash, Config.Domain, Config.Command, ClientHost, "", nil)
+	wmiexec.Timeout = int(common.Timeout)
+	return WMIExec(target, user, pass, hash, common.Domain, common.Command, ClientHost, "", nil)
 }
 
 func WMIExec(target, username, password, hash, domain, command, clientHostname, binding string, cfgIn *wmiexec.WmiExecConfig) (flag bool, err error) {

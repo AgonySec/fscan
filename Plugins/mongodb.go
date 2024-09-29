@@ -2,24 +2,24 @@ package Plugins
 
 import (
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"strings"
 	"time"
 )
 
-func MongodbScan(info *Config.HostInfo) error {
-	if Config.IsBrute {
+func MongodbScan(info *common.HostInfo) error {
+	if common.IsBrute {
 		return nil
 	}
 	_, err := MongodbUnauth(info)
 	if err != nil {
 		errlog := fmt.Sprintf("[-] Mongodb %v:%v %v", info.Host, info.Ports, err)
-		Config.LogError(errlog)
+		common.LogError(errlog)
 	}
 	return err
 }
 
-func MongodbUnauth(info *Config.HostInfo) (flag bool, err error) {
+func MongodbUnauth(info *common.HostInfo) (flag bool, err error) {
 	flag = false
 	// op_msg
 	packet1 := []byte{
@@ -48,12 +48,12 @@ func MongodbUnauth(info *Config.HostInfo) (flag bool, err error) {
 	realhost := fmt.Sprintf("%s:%v", info.Host, info.Ports)
 
 	checkUnAuth := func(address string, packet []byte) (string, error) {
-		conn, err := Config.WrapperTcpWithTimeout("tcp", realhost, time.Duration(Config.Timeout)*time.Second)
+		conn, err := common.WrapperTcpWithTimeout("tcp", realhost, time.Duration(common.Timeout)*time.Second)
 		if err != nil {
 			return "", err
 		}
 		defer conn.Close()
-		err = conn.SetReadDeadline(time.Now().Add(time.Duration(Config.Timeout) * time.Second))
+		err = conn.SetReadDeadline(time.Now().Add(time.Duration(common.Timeout) * time.Second))
 		if err != nil {
 			return "", err
 		}
@@ -80,7 +80,7 @@ func MongodbUnauth(info *Config.HostInfo) (flag bool, err error) {
 	if strings.Contains(reply, "totalLinesWritten") {
 		flag = true
 		result := fmt.Sprintf("[+] Mongodb %v unauthorized", realhost)
-		Config.LogSuccess(result)
+		common.LogSuccess(result)
 	}
 	return flag, err
 }

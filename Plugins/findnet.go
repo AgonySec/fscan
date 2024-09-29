@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"strconv"
 	"strings"
 	"time"
@@ -16,19 +16,19 @@ var (
 	bufferV3, _ = hex.DecodeString("0900ffff0000")
 )
 
-func Findnet(info *Config.HostInfo) error {
+func Findnet(info *common.HostInfo) error {
 	err := FindnetScan(info)
 	return err
 }
 
-func FindnetScan(info *Config.HostInfo) error {
+func FindnetScan(info *common.HostInfo) error {
 	realhost := fmt.Sprintf("%s:%v", info.Host, 135)
-	conn, err := Config.WrapperTcpWithTimeout("tcp", realhost, time.Duration(Config.Timeout)*time.Second)
+	conn, err := common.WrapperTcpWithTimeout("tcp", realhost, time.Duration(common.Timeout)*time.Second)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
-	err = conn.SetDeadline(time.Now().Add(time.Duration(Config.Timeout) * time.Second))
+	err = conn.SetDeadline(time.Now().Add(time.Duration(common.Timeout) * time.Second))
 	if err != nil {
 		return err
 	}
@@ -120,6 +120,6 @@ func read(text []byte, host string) error {
 		//打印hostname
 		result += "\n   [->]" + string(host)
 	}
-	Config.LogSuccess(result)
+	common.LogSuccess(result)
 	return nil
 }

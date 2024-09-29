@@ -4,30 +4,30 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/itchen-2002/fscan/Config"
+	"github.com/itchen-2002/fscan/common"
 	"strings"
 	"time"
 )
 
-func MysqlScan(info *Config.HostInfo) (tmperr error) {
-	if Config.IsBrute {
+func MysqlScan(info *common.HostInfo) (tmperr error) {
+	if common.IsBrute {
 		return
 	}
 	starttime := time.Now().Unix()
-	for _, user := range Config.Userdict["mysql"] {
-		for _, pass := range Config.Passwords {
+	for _, user := range common.Userdict["mysql"] {
+		for _, pass := range common.Passwords {
 			pass = strings.Replace(pass, "{user}", user, -1)
 			flag, err := MysqlConn(info, user, pass)
 			if flag == true && err == nil {
 				return err
 			} else {
 				errlog := fmt.Sprintf("[-] mysql %v:%v %v %v %v", info.Host, info.Ports, user, pass, err)
-				Config.LogError(errlog)
+				common.LogError(errlog)
 				tmperr = err
-				if Config.CheckErrs(err) {
+				if common.CheckErrs(err) {
 					return err
 				}
-				if time.Now().Unix()-starttime > (int64(len(Config.Userdict["mysql"])*len(Config.Passwords)) * Config.Timeout) {
+				if time.Now().Unix()-starttime > (int64(len(common.Userdict["mysql"])*len(common.Passwords)) * common.Timeout) {
 					return err
 				}
 			}
@@ -36,20 +36,20 @@ func MysqlScan(info *Config.HostInfo) (tmperr error) {
 	return tmperr
 }
 
-func MysqlConn(info *Config.HostInfo, user string, pass string) (flag bool, err error) {
+func MysqlConn(info *common.HostInfo, user string, pass string) (flag bool, err error) {
 	flag = false
 	Host, Port, Username, Password := info.Host, info.Ports, user, pass
-	dataSourceName := fmt.Sprintf("%v:%v@tcp(%v:%v)/mysql?charset=utf8&timeout=%v", Username, Password, Host, Port, time.Duration(Config.Timeout)*time.Second)
+	dataSourceName := fmt.Sprintf("%v:%v@tcp(%v:%v)/mysql?charset=utf8&timeout=%v", Username, Password, Host, Port, time.Duration(common.Timeout)*time.Second)
 	db, err := sql.Open("mysql", dataSourceName)
 	if err == nil {
-		db.SetConnMaxLifetime(time.Duration(Config.Timeout) * time.Second)
-		db.SetConnMaxIdleTime(time.Duration(Config.Timeout) * time.Second)
+		db.SetConnMaxLifetime(time.Duration(common.Timeout) * time.Second)
+		db.SetConnMaxIdleTime(time.Duration(common.Timeout) * time.Second)
 		db.SetMaxIdleConns(0)
 		defer db.Close()
 		err = db.Ping()
 		if err == nil {
 			result := fmt.Sprintf("[+] mysql %v:%v:%v %v", Host, Port, Username, Password)
-			Config.LogSuccess(result)
+			common.LogSuccess(result)
 			flag = true
 		}
 	}
