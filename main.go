@@ -1,5 +1,6 @@
 package main
 
+//go build -ldflags="-w -s" -o fs.exe -trimpath main.go
 import (
 	"fmt"
 	"github.com/AgonySec/fscan/Configs"

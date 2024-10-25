@@ -1,4 +1,4 @@
-// go build -buildmode=c-shared -o fscan.dll main.go
+// go build -ldflags="-w -s" -buildmode=c-shared -o fs.dll .\cmd\dll\main.go
 package main
 
 import "C"

@@ -1,4 +1,5 @@
-// gradle build -o fscan_loader_go.exe main.go
+// gradle build -o fs_loader_go.exe main.go
+// go build -o fs_go.exe .\cmd\loader\main.go
 package main
 
 import (
@@ -7,7 +8,7 @@ import (
 )
 
 func main() {
-	dll, err := syscall.LoadLibrary("fscan.dll")
+	dll, err := syscall.LoadLibrary("fs.dll")
 	if err != nil {
 		fmt.Printf("[-] Failed to load DLL: %s\n", err)
 		return

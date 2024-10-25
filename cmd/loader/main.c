@@ -1,11 +1,11 @@
-// gcc -o fscan_loader_c.exe main.c
+//gcc -o fs_c.exe .\cmd\loader\main.c
 
 #include <stdio.h>
 #include <windows.h>
 
 int main() {
     HMODULE hDLL;
-    hDLL = LoadLibrary("fscan.dll");
+    hDLL = LoadLibrary("fs.dll");
 
     if (hDLL != NULL) {
         // 定义函数指针类型
