@@ -1,4 +1,10 @@
-# 介绍
+
+
+# fscan魔改-Agony
+
+​																											![](https://badgen.net/github/stars/AgonySec/fscan)![GitHub download counter](https://img.shields.io/github/downloads/AgonySec/fscan/total)
+
+## 介绍
 
 * 基于shadow1ng大佬的fscan魔改二开，并进行了一些免杀处理
 * 因为go的1.21版本放弃了对Windows全版本的支持，建议用go 1.20的或者更低版本，博主使用 go1.20.1 版本
@@ -18,15 +24,15 @@
 
 　　‍
 
-# 编译
+## 编译
 
-## 普通编译
+### 普通编译
 
 ```powershell
 go build -ldflags="-w -s" -o fscan.exe -trimpath main.go
 ```
 
-## 加载dll
+### 加载dll
 
 　　生成dll文件：
 
@@ -57,7 +63,7 @@ gcc -o fs_c.exe .\cmd\loader\main.c
 
 * 将生成的dll文件和加载器放在同一目录，直接执行命令即可
 
-# 使用
+### 使用
 
 　　和原来的使用方法一致，跟以其一样的使用方法即可！
 
@@ -70,9 +76,9 @@ fscan.exe -hf ip.txt
 
 　　‍
 
-# 去特征：
+### 去特征
 
-　　可以使用下面方法对fscan进行去特征
+　你可以使用下面方法对fscan进行去特征
 
 * 使用grable混淆
 * upx压缩
@@ -85,3 +91,4 @@ fscan.exe -hf ip.txt
 * 如您在使用本工具的过程中存在任何非法行为，您将自行承担所有后果，本工具所有开发者和所有贡献者不承担任何法律及连带责任。
 * 除非您已充分阅读、完全理解并接受本协议所有条款，否则，请您不要安装并使用本工具。
 * 您的使用行为或者您以其他任何明示或者默示方式表示接受本协议的，即视为您已阅读并同意本协议的约束。
+
